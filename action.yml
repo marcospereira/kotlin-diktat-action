@@ -1,0 +1,66 @@
+name: 'kotlin-diktat-action'
+description: 'Installs and runs diktat. For details about inputs check https://diktat.saveourtool.com/diktat-cli/#option-summary'
+author: 'marcospereira'
+branding:
+  icon: 'check-circle'
+  color: 'purple'
+
+inputs:
+  patterns:
+    description: "A list of files to process by diktat"
+    required: false
+    default: "src/main/kotlin"
+
+  config:
+    description: "Specify the location of the YAML configuration file. By default, diktat-analysis.yml in the current directory is used."
+    required: false
+    default: "diktat-analysis.yml"
+
+  reporter:
+    description: "The reporter to use to log errors to output. Value should be one of [checkstyle, html, json, plain, plain_group_by_file, sarif]"
+    required: false
+    default: ""
+
+  output:
+    description: "Redirect the reporter output to a file. Must be provided when the reporter is provided."
+    required: false
+    default: ""
+
+  group-by-file:
+    description: "A flag to group found errors by files."
+    required: false
+    default: "false"
+
+  log-level:
+    description: "Control the log level. Value should be one of [error, warn, info, debug, trace]"
+    required: false
+    default: "info"
+
+runs:
+  using: composite
+  steps:
+    - name: Check inputs
+      if: ${{ inputs.reporter != "" && inputs.output == "" }}
+      uses: actions/github-script@v7
+      with:
+        script: |
+          core.setFailed(`A file for the reporter output is not provided.`);
+
+    - name: Download diKTat
+      shell: bash
+      run: |
+        curl -L -O "https://github.com/saveourtool/diktat/releases/download/v2.0.0/diktat"
+        chmod +x diktat
+        mv diktat $RUNNER_TEMP
+
+    - name: Runs diKTat
+      shell: bash
+      env:
+        reporter_param: ${{ inputs.reporter == '' && '' || '--reporter ' + inputs.reporter }}
+        output_param: ${{ inputs.output == '' && '' || '--output ' + inputs.output }}
+      run: |
+        "$RUNNER_TEMP/diktat" "$reporter_param" "$output_param" \
+          --config ${{ inputs.config }} \
+          --group-by-file ${{ inputs.group-by-file }} \
+          --log-level ${{ inputs.log-level }} \
+          ${{ inputs.patterns }
