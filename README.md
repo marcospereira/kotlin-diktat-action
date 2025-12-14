@@ -25,15 +25,21 @@ The action accepts inputs based on what [diKTat CLI](https://diktat.saveourtool.
 
 The supported inputs are:
 
+- `version`: The diktat version to use.
+  - Default: `2.0.0`
+  - Examples:
+    ```yaml
+    version: "1.2.5"
+    ```
 - `patterns`: A list of files to process by diktat
-    - Default: "src/main/kotlin"
-    - Examples:
-      ```yaml
-      patterns: "src/main/kotlin src/test/kotlin src/functionalTest/kotlin"
-      ```
-      ```yaml
-      patterns: "src/**/*.kt"
-      ```
+  - Default: "src/main/kotlin"
+  - Examples:
+    ```yaml
+    patterns: "src/main/kotlin src/test/kotlin src/functionalTest/kotlin"
+    ```
+    ```yaml
+    patterns: "src/**/*.kt"
+    ```
 - `config`: specify the location of the YAML configuration file. By default, diktat-analysis.yml in the current directory is used
   - Default: `"diktat-analysis.yml"`
   - Examples:

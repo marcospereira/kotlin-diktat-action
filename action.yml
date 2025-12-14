@@ -6,6 +6,11 @@ branding:
   color: 'purple'
 
 inputs:
+  version:
+    description: "The diktat version that will be installed."
+    required: false
+    default: "2.0.0"
+
   patterns:
     description: "A list of files to process by diktat"
     required: false
@@ -42,9 +47,14 @@ runs:
     - name: Download diKTat
       shell: bash
       run: |
-        curl -L -O "https://github.com/saveourtool/diktat/releases/download/v2.0.0/diktat"
+        curl -fSLO \
+          --retry 8 \
+          --retry-delay 2 \
+          --retry-max-time 300 \
+          --retry-connrefused \
+          https://github.com/saveourtool/diktat/releases/download/v${{ inputs.version }}/diktat
         chmod +x diktat
-        mv diktat $RUNNER_TEMP
+        mv -v diktat $RUNNER_TEMP
 
     - name: Runs diKTat
       shell: bash
